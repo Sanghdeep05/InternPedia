@@ -1,0 +1,62 @@
+import pickle
+
+class Task:
+    def __init__(self, name, completed=False):
+        self.name = name
+        self.completed = completed
+
+def load_tasks():
+    try:
+        with open('tasks.pkl', 'rb') as file:
+            return pickle.load(file)
+    except FileNotFoundError:
+        return []
+
+def save_tasks(tasks):
+    with open('tasks.pkl', 'wb') as file:
+        pickle.dump(tasks, file)
+
+def display_menu():
+    print("1. View tasks")
+    print("2. Add task")
+    print("3. Mark task as done")
+    print("4. Mark task as undone")
+    print("5. Remove task")
+    print("6. Exit")
+
+def view_tasks(tasks):
+    for index, task in enumerate(tasks, start=1):
+        status = "Done" if task.completed else "Undone"
+        print(f"{index}. [{status}] {task.name}")
+
+def main():
+    tasks = load_tasks()
+    while True:
+        display_menu()
+        choice = input("Enter your choice: ")
+        if choice == '1':
+            view_tasks(tasks)
+        elif choice == '2':
+            task_name = input("Enter task name: ")
+            tasks.append(Task(task_name))
+        elif choice == '3':
+            view_tasks(tasks)
+            index = int(input("Enter task index to mark as done: ")) - 1
+            tasks[index].completed = True
+        elif choice == '4':
+            view_tasks(tasks)
+            index = int(input("Enter task index to mark as undone: ")) - 1
+            tasks[index].completed = False
+        elif choice == '5':
+            view_tasks(tasks)
+            index = int(input("Enter task index to remove: ")) - 1
+            tasks.pop(index)
+        elif choice == '6':
+            save_tasks(tasks)
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
+
