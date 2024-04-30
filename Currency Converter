@@ -1,0 +1,57 @@
+# Function to fetch exchange rates from an API
+def get_exchange_rates(api_key, base_currency):
+    try:
+        url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
+        data = response.json()
+        return data['rates']
+    except requests.exceptions.RequestException as e:
+        print("Error fetching exchange rates:", e)
+        return None
+
+
+# Function to convert currency
+def convert_currency(amount, source_currency, target_currency, exchange_rates):
+    if source_currency in exchange_rates and target_currency in exchange_rates:
+        source_rate = exchange_rates[source_currency]
+        target_rate = exchange_rates[target_currency]
+        converted_amount = amount / source_rate * target_rate
+        return converted_amount
+    else:
+        print("Invalid currency codes.")
+        return None
+
+
+# Main function
+def main():
+    api_key = "YOUR_API_KEY"
+    base_currency = "USD"  # Base currency for fetching exchange rates
+    print("Welcome to the Currency Converter!")
+
+    while True:
+        try:
+            amount = float(input("Enter the amount to convert: "))
+            source_currency = input("Enter the source currency code (e.g., USD): ").upper()
+            target_currency = input("Enter the target currency code (e.g., EUR): ").upper()
+
+            # Fetch exchange rates
+            exchange_rates = get_exchange_rates(api_key, base_currency)
+            if exchange_rates is None:
+                continue
+
+            # Convert currency
+            converted_amount = convert_currency(amount, source_currency, target_currency, exchange_rates)
+            if converted_amount is not None:
+                print(f"{amount} {source_currency} equals {converted_amount:.2f} {target_currency}")
+
+            choice = input("Do you want to convert another currency? (yes/no): ")
+            if choice.lower() != "yes":
+                break
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+            continue
+
+
+if __name__ == "__main__":
+    main()
